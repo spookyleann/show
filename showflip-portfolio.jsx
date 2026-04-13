@@ -32,6 +32,49 @@ const fmt = (n) => {
 };
 const pct = (n) => (n == null || isNaN(n) ? "—" : (n >= 0 ? "+" : "") + n.toFixed(1) + "%");
 
+const PRELOAD_POSITIONS = [
+  { name: "Sal Stewart", series: "Live", lots: [[250, 4], [251, 3], [252, 1], [253, 1]] },
+  { name: "Logan O'Hoppe", series: "Live", lots: [[175, 4], [180, 8]] },
+  { name: "Ezequiel Tovar", series: "Live", lots: [[80, 11], [100, 7]] },
+  { name: "Adley Rutschman", series: "Live", lots: [[410, 7]] },
+  { name: "Brent Rooker", series: "Live", lots: [[1200, 3]] },
+  { name: "Max Fried", ovr: 85, team: "Yankees", series: "Live", lots: [[3699, 1]] },
+  { name: "David Bednar", series: "Live", lots: [[179, 4]] },
+  { name: "Camilo Doval", series: "Live", lots: [[59, 2], [57, 2], [56, 1]] },
+  { name: "Luis Gil", series: "Live", lots: [[40, 10]] },
+  { name: "Cam Schlittler", series: "Live", lots: [[580, 3], [576, 4], [673, 1], [660, 1], [662, 2]] },
+  { name: "Jackson Chourio", series: "Live", lots: [[1200, 3], [1205, 9]] },
+  { name: "Christian Yelich", series: "Live", lots: [[1005, 9]] },
+  { name: "JJ Wetherholt", series: "Live", lots: [[999, 2]] },
+  { name: "Eury Pérez", series: "Live", lots: [[446, 1], [450, 4], [449, 1], [400, 1], [447, 1]] },
+  { name: "Joe Ryan", series: "Live", lots: [[1700, 2], [1750, 6], [1845, 1], [1844, 1]] },
+  { name: "Matt McLain", series: "Live", lots: [[104, 11], [105, 9]] },
+  { name: "Cristopher Sánchez", series: "Live", lots: [[1900, 11], [2240, 1]] },
+];
+
+function expandLots(lots = []) {
+  return lots.flatMap(([price, qty]) => Array.from({ length: qty }, () => price));
+}
+
+function buildPreloadedPortfolio() {
+  return PRELOAD_POSITIONS.flatMap((card) =>
+    expandLots(card.lots).map((buyPrice, idx) => ({
+      id: `seed-${card.name}-${idx}-${buyPrice}`,
+      name: card.name,
+      uuid: `seed-${card.name}`,
+      ovr: card.ovr,
+      team: card.team,
+      series: card.series,
+      img: "",
+      buyPrice,
+      buyDate: card.buyDate || "2026-04-01",
+      currentSellPrice: buyPrice,
+      currentBuyPrice: buyPrice,
+      updatedAt: Date.now(),
+    }))
+  );
+}
+
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -503,6 +546,7 @@ export default function App() {
       try {
         const r = await window.storage.get("sfp-v2");
         if (r?.value) setPortfolio(JSON.parse(r.value));
+        else setPortfolio(buildPreloadedPortfolio());
       } catch {}
       setReady(true);
     })();
