@@ -32,6 +32,49 @@ const fmt = (n) => {
 };
 const pct = (n) => (n == null || isNaN(n) ? "—" : (n >= 0 ? "+" : "") + n.toFixed(1) + "%");
 
+const PRELOAD_POSITIONS = [
+  { name: "Ben Rice", ovr: 0, team: "Yankees", series: "Live", prices: [349,349,349,349,349,349,349,348], buyDate: "2026-04-08" },
+  { name: "Willson Contreras", ovr: 85, team: "Red Sox", series: "World Baseball Classic", prices: [1680,1694,1680], buyDate: "2026-04-03" },
+  { name: "Wilyer Abreu", ovr: 0, team: "Red Sox", series: "Live", prices: [2880], buyDate: "2026-04-03" },
+  { name: "Harrison Cohen", ovr: 0, team: "", series: "Live", prices: [1724], buyDate: "2026-04-05" },
+  { name: "Colson Montgomery", ovr: 0, team: "", series: "Live", prices: [219], buyDate: "2026-04-05" },
+  { name: "Seranthony Domínguez", ovr: 0, team: "", series: "Live", prices: [200], buyDate: "2026-04-05" },
+  { name: "Shane Smith", ovr: 0, team: "", series: "Live", prices: [139], buyDate: "2026-04-05" },
+  { name: "Austin Hays", ovr: 0, team: "", series: "Live", prices: [126], buyDate: "2026-04-05" },
+  { name: "Sean Burke", ovr: 0, team: "", series: "Live", prices: [115], buyDate: "2026-04-05" },
+  { name: "Lenyn Sosa", ovr: 0, team: "", series: "Live", prices: [112], buyDate: "2026-04-05" },
+  { name: "Davis Martin", ovr: 0, team: "", series: "Live", prices: [80], buyDate: "2026-04-05" },
+  { name: "Cedric Mullins", ovr: 88, team: "Rays", series: "New Threads", prices: [11486], buyDate: "2026-04-01" },
+  { name: "Daniel Susac", ovr: 89, team: "Giants", series: "Topps Now", prices: [0], buyDate: "2026-04-01" },
+  { name: "Bobby Witt Jr.", ovr: 91, team: "Royals", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Owen Caissie", ovr: 88, team: "Marlins", series: "Topps Now", prices: [0], buyDate: "2026-04-01" },
+  { name: "Aroldis Chapman", ovr: 88, team: "Red Sox", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Gunnar Henderson", ovr: 87, team: "Orioles", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Ronald Acuña Jr.", ovr: 87, team: "Braves", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Freddie Freeman", ovr: 87, team: "Dodgers", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Logan Gilbert", ovr: 86, team: "Mariners", series: "Live", prices: [0], buyDate: "2026-04-01" },
+  { name: "Max Fried", ovr: 85, team: "Yankees", series: "Live", prices: [3699], buyDate: "2026-04-01" },
+];
+
+function buildPreloadedPortfolio() {
+  return PRELOAD_POSITIONS.flatMap((card) =>
+    card.prices.map((buyPrice, idx) => ({
+      id: `seed-${card.name}-${idx}-${buyPrice}`,
+      name: card.name,
+      uuid: `seed-${card.name}`,
+      ovr: card.ovr,
+      team: card.team,
+      series: card.series,
+      img: "",
+      buyPrice,
+      buyDate: card.buyDate,
+      currentSellPrice: buyPrice,
+      currentBuyPrice: buyPrice,
+      updatedAt: Date.now(),
+    }))
+  );
+}
+
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -503,6 +546,7 @@ export default function App() {
       try {
         const r = await window.storage.get("sfp-v2");
         if (r?.value) setPortfolio(JSON.parse(r.value));
+        else setPortfolio(buildPreloadedPortfolio());
       } catch {}
       setReady(true);
     })();
